@@ -102,7 +102,8 @@ class MemoryManager:
             raise ValueError(f"Conversation id: {conversation_id} is not present in past conversations.")
 
         query_vector = self.embed_client.embed_queries([query])[0].astype(np.float32).tobytes()
-        messages = self.datastore.search_documents(
-            query_vector=query_vector, conversation_id=conversation_id, topk=self.topk
+        return self.datastore.search_documents(
+            query_vector=query_vector,
+            conversation_id=conversation_id,
+            topk=self.topk,
         )
-        return messages

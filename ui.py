@@ -32,7 +32,7 @@ def get_text():
     Returns:
         (str): The text entered by the user
     """
-    input_text = st.text_input(
+    return st.text_input(
         "You: ",
         st.session_state["input"],
         key="input",
@@ -41,12 +41,9 @@ def get_text():
         on_change=send_text,
     )
 
-    return input_text
-
 
 def send_text():
-    user_input = st.session_state["input"]
-    if user_input:
+    if user_input := st.session_state["input"]:
         # Use the ChatGPTClient object to generate a response
         url = "http://localhost:8000/converse"
         payload = {"message": user_input, "conversation_id": st.session_state.conversation_id}
@@ -67,8 +64,12 @@ def new_chat():
     """
     save = []
     for i in range(len(st.session_state["generated"]) - 1, -1, -1):
-        save.append("Human:" + st.session_state["past"][i])
-        save.append("Assistant:" + st.session_state["generated"][i])
+        save.extend(
+            (
+                "Human:" + st.session_state["past"][i],
+                "Assistant:" + st.session_state["generated"][i],
+            )
+        )
     st.session_state["stored_session"].append(save)
     st.session_state["generated"] = []
     st.session_state["past"] = []
@@ -103,12 +104,10 @@ with st.expander("Conversation", expanded=True):
     for i in range(len(st.session_state["generated"]) - 1, -1, -1):
         st.info(st.session_state["past"][i], icon="🧐")
         st.success(st.session_state["generated"][i], icon="🤖")
-        download_str.append(st.session_state["past"][i])
-        download_str.append(st.session_state["generated"][i])
-
-    # Can throw error - requires fix
-    download_str = ["\n".join(download_str)]
-    if download_str:
+        download_str.extend(
+            (st.session_state["past"][i], st.session_state["generated"][i])
+        )
+    if download_str := ["\n".join(download_str)]:
         st.download_button("Download", download_str[0])
 
 # Display stored conversation sessions in the sidebar
@@ -116,7 +115,6 @@ for i, sublist in enumerate(st.session_state.stored_session):
     with st.sidebar.expander(label=f"Conversation-Session:{i}"):
         st.write(sublist)
 
-# Allow the user to clear all stored conversation sessions
-if st.session_state.stored_session:
-    if st.sidebar.checkbox("Clear-all"):
+if st.sidebar.checkbox("Clear-all"):
+    if st.session_state.stored_session:
         del st.session_state.stored_session

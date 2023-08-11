@@ -15,8 +15,7 @@ def args_to_kwargs(args: Tuple, func: Callable) -> Dict[str, Any]:
     # skip self and cls args for instance and class methods
     if any(arg_names) and arg_names[0] in ["self", "cls"]:
         arg_names = arg_names[1 : 1 + len(args)]
-    args_as_kwargs = {arg_name: arg for arg, arg_name in zip(args, arg_names)}
-    return args_as_kwargs
+    return {arg_name: arg for arg, arg_name in zip(args, arg_names)}
 
 
 def retry_with_exponential_backoff(

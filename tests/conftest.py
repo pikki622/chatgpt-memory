@@ -20,6 +20,4 @@ def redis_datastore():
         port=REDIS_PORT,
         password=REDIS_PASSWORD,
     )
-    redis_datastore = RedisDataStore(config=redis_datastore_config, do_flush_data=True)
-
-    return redis_datastore
+    return RedisDataStore(config=redis_datastore_config, do_flush_data=True)
