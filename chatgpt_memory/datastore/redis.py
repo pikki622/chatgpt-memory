@@ -117,9 +117,7 @@ class RedisDataStore(DataStore):
             .dialect(2)
         )
         params_dict = {"vec_param": query_vector}
-        result_documents = self.redis_connection.ft().search(query, query_params=params_dict).docs
-
-        return result_documents
+        return self.redis_connection.ft().search(query, query_params=params_dict).docs
 
     def get_all_conversation_ids(self) -> List[str]:
         """
@@ -132,11 +130,12 @@ class RedisDataStore(DataStore):
         result_documents = self.redis_connection.ft().search(query).docs
 
         conversation_ids: List[str] = []
-        conversation_ids = list(
-            set([getattr(result_document, "conversation_id") for result_document in result_documents])
+        return list(
+            {
+                getattr(result_document, "conversation_id")
+                for result_document in result_documents
+            }
         )
-
-        return conversation_ids
 
     def delete_documents(self, conversation_id: str):
         """

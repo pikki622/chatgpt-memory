@@ -2,9 +2,7 @@ import os
 
 import dotenv
 
-# Load environment variables from .env file
-_TESTING = os.getenv("CHATGPT_MEMORY_TESTING", False)
-if _TESTING:
+if _TESTING := os.getenv("CHATGPT_MEMORY_TESTING", False):
     # for testing we use the .env.example file instead
     dotenv.load_dotenv(dotenv.find_dotenv(".env.example"))
 else:

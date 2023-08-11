@@ -88,12 +88,12 @@ class EmbeddingClient(LLMClient):
 
         if self.openai_embedding_config.use_tiktoken:
             tokenized_payload = self._tokenizer.encode(text)
-            decoded_string = self._tokenizer.decode(tokenized_payload[: self.max_seq_len])
+            return self._tokenizer.decode(tokenized_payload[: self.max_seq_len])
         else:
             tokenized_payload = self._tokenizer.tokenize(text)
-            decoded_string = self._tokenizer.convert_tokens_to_string(tokenized_payload[: self.max_seq_len])
-
-        return decoded_string
+            return self._tokenizer.convert_tokens_to_string(
+                tokenized_payload[: self.max_seq_len]
+            )
 
     def embed(self, model: str, text: List[str]) -> np.ndarray:
         """
@@ -116,10 +116,11 @@ class EmbeddingClient(LLMClient):
 
         generated_embeddings: List[Any] = []
 
-        headers: Dict[str, str] = {"Content-Type": "application/json"}
         payload: Dict[str, Union[List[str], str]] = {"model": model, "input": text}
-        headers["Authorization"] = f"Bearer {self.api_key}"
-
+        headers: Dict[str, str] = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
         res = openai_request(
             url=self.openai_embedding_config.url,
             headers=headers,
